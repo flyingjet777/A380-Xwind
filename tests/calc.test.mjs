@@ -67,3 +67,11 @@ test('Pure headwind has no limit within 99 kt', () => {
 test('Pure tailwind: max wind 9 kt (10 = NO GO)', () => {
   assert.equal(evaluate({ engine: RR, rwyMagHdg: 333, windDir: 153, windSpd: 5 }).maxWindKt, 9);
 });
+
+test('ENV points RKSI 334: RR L244/35 R064/35, corner L225/30 R083/30; EA corner 222/26', async () => {
+  const { maxWind } = await import('../js/calc.js');
+  const mw = (e, d) => maxWind({ engine: e, rwyMagHdg: 334, windMag: d });
+  assert.equal(mw(RR, 244), 35); assert.equal(mw(RR, 64), 35);
+  assert.equal(mw(RR, 225), 30); assert.equal(mw(RR, 83), 30);
+  assert.equal(mw(EA, 222), 26); assert.equal(mw(EA, 86), 26);
+});

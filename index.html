@@ -167,6 +167,7 @@ button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
       <dt>9W · 12E</dt><dd>WIND REF 옆 LSK — 편차 수동 입력 (TRUE로 전환)</dd>
       <dt>빈 칸 + LSK</dt><dd>WIND REF: MAG/TRUE 전환 · APT/RWY: 공항 선택</dd>
       <dt>CLR → LSK</dt><dd>해당 칸 삭제</dd>
+      <dt>ENV</dt><dd>선택 활주로의 측풍 한계 지점 바람 (방위/최대 정상풍) · PLOT&gt; 로 도표</dd>
     </dl>
     <h2>판정 기준</h2>
     <div>정상풍만으로 판정 · 성분 0.1 kt 반올림 · TW 10.0 kt = NO GO · XW가 한계와 같으면 GO · 한계 표시는 0.1 kt 내림 · Gust는 참조 표시만.</div>
@@ -384,6 +385,30 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
     return { title: ln('ttl', t(S.apt, 'green small'), '', 'RUNWAY'), rows };
   }
 
+  function pageEnv() {
+    const e = E[S.eng], h = S.hdg, x10 = e.xwAtTailwindLimitKt;
+    const pt = off => {
+      let d = Math.round((((h + off) % 360) + 360) % 360); if (d === 0) d = 360;
+      return { d, v: maxWind({ engine: e, rwyMagHdg: h, windMag: d, tailwindLimitKt: TWLIM }) };
+    };
+    const tc = 180 - Math.atan2(x10, TWLIM) * 180 / Math.PI;   // angle off nose of the XW/TW corner
+    const fmt = (side, p) => side + ' ' + pad3(p.d) + '°/' + pad2(p.v);
+    const r = calc();
+    const wDat = r ? t(pad3(Math.round(r.windMag) || 360) + '/' + pad2(S.wspd), 'cyan') : t('---', 'dim');
+    const vDat = r ? (r.go ? '<span class="verdict go">GO</span>' : '<span class="verdict nogo">NO GO</span>') : '';
+    return {
+      title: ln('ttl', '', t(S.eng, 'green small'), 'ENVELOPE'),
+      rows: [
+        ['ENGINE', 'XW LIMIT TW0/TW' + TWLIM], [t(engShort(S.eng), 'green'), t(e.xwMaxKt + '/' + x10, 'green')],
+        ['APT/RWY', 'RWY HDG(M)'], [t((S.apt || '----') + '/' + (S.rwy || 'MAN'), 'green'), t(fmtHdg(h), 'green')],
+        ['L XW ' + e.xwMaxKt, 'R XW ' + e.xwMaxKt], [t(fmt('L', pt(-90)), 'green'), t(fmt('R', pt(90)), 'green')],
+        ['L XW ' + x10 + '/TW ' + TWLIM, 'R XW ' + x10 + '/TW ' + TWLIM], [t(fmt('L', pt(-tc)), 'green'), t(fmt('R', pt(tc)), 'green')],
+        ['WIND (M)', r ? (r.go ? 'TAKEOFF' : (!r.twOk ? 'TW LIMIT' : 'XW LIMIT')) : ''], [wDat, vDat],
+        ['', ''], [t('<XWIND', 'white'), t('PLOT>', 'white')],
+      ],
+    };
+  }
+
   function plotSVG(r) {
     const e = E[S.eng], xm = e.xwMaxKt, x10 = e.xwAtTailwindLimitKt, tw = TWLIM, R = 50;
     let s = '<svg viewBox="-62 -62 124 124" role="img" aria-label="Takeoff wind envelope">';
@@ -426,7 +451,7 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
   const scr = document.getElementById('screen');
   function render() {
     const spText = S.msg ? t(S.msg, 'white') : t(S.sp, 'white');
-    if (S.page === 'ENV') {
+    if (S.page === 'PLOT') {
       const r = calc();
       const head = ln('ttl', t(S.rwy ? (S.apt || '') + ' ' + S.rwy : '', 'green small'), t(S.eng, 'green small'), 'ENVELOPE');
       const read = r
@@ -437,7 +462,7 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
       scr.innerHTML = head + '<div class="plot">' + plotSVG(r) + '</div>' + read + ln('sp', spText);
       return;
     }
-    const p = S.page === 'ENG' ? pageEng() : S.page === 'APT' ? pageApt() : S.page === 'RWY' ? pageRwy() : pageMain();
+    const p = S.page === 'ENG' ? pageEng() : S.page === 'APT' ? pageApt() : S.page === 'RWY' ? pageRwy() : S.page === 'ENV' ? pageEnv() : pageMain();
     let html = p.title;
     p.rows.forEach((pair, i) => {
       const isLbl = i % 2 === 0;
@@ -487,7 +512,7 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
         { if (!/^\d{1,2}$/.test(sp)) return err(sp ? 'FORMAT ERROR' : '');
           const g = +sp; if (S.wspd != null && g <= S.wspd) return err('ENTRY OUT OF RANGE');
           S.gust = g; return ok(); }
-      case 'R6': if (calc()) return go('ENV'); return;
+      case 'R6': if (S.hdg != null) return go('ENV'); return;
     }
   }
 
@@ -499,6 +524,8 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
       return;
     }
     if (S.page === 'MAIN') return lskMain(id);
+    if (S.page === 'ENV') { if (id === 'L6') return go('MAIN'); if (id === 'R6') return go('PLOT'); if (id === 'L2') return go('APT'); return; }
+    if (S.page === 'PLOT') { if (id === 'L6' || id === 'R6') return go('ENV'); return; }
     if (S.page === 'APT') {
       const ids = Object.keys(A), i = +id[1] - 1;
       if (id[0] === 'L' && ids[i]) {
@@ -535,7 +562,7 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
 
   function fn(f) {
     if (f !== 'ENG' && !S.eng) { S.page = 'ENG'; return err('SELECT ENGINE'); }
-    if (f === 'ENV' && !calc()) { S.page = 'MAIN'; return err('ENTER RWY AND WIND'); }
+    if (f === 'ENV' && S.hdg == null) { S.page = 'MAIN'; return err('SELECT RWY'); }
     go(f);
   }
 
