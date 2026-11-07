@@ -358,16 +358,15 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
     };
   }
 
-  const APT_PER_PAGE = 10;
+  const APT_PER_PAGE = 5;
   function pageApt() {
     const ids = Object.keys(A), pages = Math.max(1, Math.ceil(ids.length / APT_PER_PAGE));
     if (S.aptPage >= pages) S.aptPage = 0;
     const base = S.aptPage * APT_PER_PAGE, rows = [];
-    const lbl = id => id ? esc(A[id].name + ' ' + fmtVar(A[id].varDeg)) : '';
     for (let i = 0; i < 5; i++) {
-      const L = ids[base + i], R = ids[base + 5 + i];
-      rows.push([lbl(L), lbl(R)],
-        [L ? t('<' + L, S.apt === L ? 'green' : 'cyan') : '', R ? t(R + '>', S.apt === R ? 'green' : 'cyan') : '']);
+      const id = ids[base + i];
+      rows.push(id ? [esc(A[id].name), 'VAR'] : ['', ''],
+        id ? [t('<' + id, S.apt === id ? 'green' : 'cyan'), t(fmtVar(A[id].varDeg), 'white')] : ['', '']);
     }
     rows.push(['', ''], [t('<RETURN', 'white'), t('MORE>', pages > 1 ? 'white' : 'dim')]);
     return { title: ln('ttl', '', t((S.aptPage + 1) + '/' + pages, 'white small'), 'AIRPORT'), rows, rawLabels: true };
@@ -537,7 +536,8 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
       const ids = Object.keys(A), pages = Math.max(1, Math.ceil(ids.length / APT_PER_PAGE));
       if (id === 'L6') return go('MAIN');
       if (id === 'R6') { S.aptPage = (S.aptPage + 1) % pages; return render(); }
-      const n = +id[1] - 1, x = ids[S.aptPage * APT_PER_PAGE + (id[0] === 'L' ? n : 5 + n)];
+      if (id[0] !== 'L') return;
+      const x = ids[S.aptPage * APT_PER_PAGE + (+id[1] - 1)];
       if (x) { S.apt = x; S.varDeg = A[x].varDeg; S.varMan = false; save(); return go('RWY'); }
       return;
     }
