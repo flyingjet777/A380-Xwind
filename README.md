@@ -19,7 +19,7 @@ data/envelopes.json   엔진별 envelope (RR Trent 970/972, EA GP7270)
 data/airports.json    공항 프리셋 (RKSI, RJAA, KLAX, YSSY, VTBS)
 js/calc.js            계산 코어 (정수 0.1 kt 단위 연산)
 src/app.html          CDU 화면 템플릿
-tools/build.py        calc.js + data → index.html 단일 파일 빌드
+tools/build.py        calc.js + data → index.html (GitHub Pages용 완전한 문서) + dist/artifact.html
 tests/calc.test.mjs   경계값 테스트
 ```
 

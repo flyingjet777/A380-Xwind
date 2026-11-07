@@ -1,3 +1,11 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#1c1e21">
 <title>A380 TO Xwind</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,14 +25,18 @@
   --text: -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
   color-scheme: dark;
 }
-html, body { background: var(--bench); color: var(--label); }
+html, body { background: var(--bench); color: var(--label); height: 100%; }
 body {
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 20px 32px;
+  padding-block: 16px;
+  box-sizing: border-box;
   font-family: var(--text);
+  display: grid; place-items: center;
+  margin: 0;
 }
-.wrap { max-width: 560px; margin: 0 auto; display: grid; gap: 16px; }
+/* CDU scales to the screen: width limited by viewport height (CDU aspect ~1:1.47) */
+.wrap { width: min(100%, calc((100vh - 36px) / 1.48)); width: min(100%, calc((100dvh - 36px) / 1.48)); margin: 0 auto; }
 
 /* ---------- device ---------- */
 .cdu {
@@ -123,27 +135,11 @@ button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 .k.clr { grid-column: 4 / 6; grid-row: 3 / 5; aspect-ratio: auto; border-radius: .22em; font-size: 1.15em; }
 .k.sm { font-size: 1.05em; }
 
-/* ---------- notes ---------- */
-.notes { display: grid; gap: 10px; font-size: 13px; line-height: 1.55; color: var(--foot); }
-.notes h2 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--label); margin: 0; font-weight: 600; }
-.notes dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
-.notes dt { color: var(--label); font-family: var(--mono); font-size: 12px; }
-.notes dd { margin: 0; min-width: 0; }
-.notes .warn { color: var(--amber); }
-.notes { display: none; }
-/* Landscape (iPad etc.): CDU left, notes right. Portrait: CDU only. */
-@media (orientation: landscape) and (min-width: 900px) {
-  .wrap {
-    max-width: 1000px;
-    grid-template-columns: min(560px, calc((100vh - 60px) / 1.5)) minmax(240px, 380px);
-    grid-template-columns: min(560px, calc((100dvh - 60px) / 1.5)) minmax(240px, 380px);
-    justify-content: center; align-items: start; column-gap: 28px;
-  }
-  .notes { display: grid; align-content: start; padding-top: 8px; }
-}
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
+</head>
+<body>
 <div class="wrap">
   <div class="cdu" role="application" aria-label="A380 takeoff crosswind CDU">
     <div class="top">
@@ -170,11 +166,6 @@ button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
     </div>
   </div>
 
-  <section class="notes" aria-label="판정 기준">
-    <h2>판정 기준</h2>
-    <div>정상풍만으로 판정 · 성분 0.1 kt 반올림 · TW 10.0 kt = NO GO · XW가 한계와 같으면 GO · 한계 표시는 0.1 kt 내림 · Gust는 참조 표시만.</div>
-    <div class="warn">Envelope은 Airbus FOT 999.0069/26 도표 판독값입니다(잠정). 참고용이며 AFM/FCOM과 회사 규정이 우선합니다.</div>
-  </section>
 </div>
 
 <script>
@@ -619,3 +610,6 @@ function parseWind(sp, prev = {}) {
   render();
 })();
 </script>
+
+</body>
+</html>
