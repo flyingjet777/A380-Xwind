@@ -1,0 +1,566 @@
+<title>A380 TO Xwind</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=B612+Mono:wght@400;700&family=B612:wght@700&display=swap">
+<style>
+/* Layout: one physical MCDU unit on a graphite bench — 14-row character screen flanked by LSK columns that share its row grid, keypad below */
+:root {
+  --bench: #1c1e21;
+  --bezel-hi: #b6b9bc; --bezel: #a1a4a7; --bezel-lo: #85888b;
+  --key: #1a1b1d; --key-edge: #3b3d41; --key-text: #f3f4f5; --fn-text: #f2a33a;
+  --screen: #040506; --label: #e8ebee; --cyan: #33b6f2; --green: #3fe06b;
+  --amber: #f2a33a; --red: #ff4d4d; --dim: #6d747b; --grid: #262c32; --hatch: #39414a;
+  --foot: #9aa2aa;
+  --mono: "B612 Mono", ui-monospace, Menlo, Consolas, monospace;
+  --keyface: "B612", "Helvetica Neue", Arial, sans-serif;
+  --text: -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  color-scheme: dark;
+}
+html, body { background: var(--bench); color: var(--label); }
+body {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 32px;
+  font-family: var(--text);
+}
+.wrap { max-width: 560px; margin: 0 auto; display: grid; gap: 16px; }
+
+/* ---------- device ---------- */
+.cdu {
+  container-type: inline-size;
+  background: linear-gradient(180deg, var(--bezel-hi), var(--bezel) 35%, var(--bezel-lo));
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 var(--bezel-hi), 0 10px 30px rgba(0,0,0,.45);
+  padding-block: 5% 6%;
+}
+.top, .pad { font-size: clamp(9px, 3.3vw, 18px); font-size: 3.35cqw; }
+.top {
+  --row: 1.66em;
+  display: grid; grid-template-columns: 10% 1fr 10%; column-gap: 1.5%;
+}
+.lsks, .screen {
+  display: grid; grid-template-rows: repeat(14, var(--row));
+  padding-block: .55em;
+}
+.lsks button { align-self: center; }
+.lsks.l button { justify-self: end; }
+.lsks.r button { justify-self: start; }
+.lsk {
+  width: 2.5em; height: 1.35em; border-radius: .25em;
+  background: var(--key); border: 1px solid var(--key-edge);
+  box-shadow: 0 .12em 0 rgba(0,0,0,.5);
+  display: grid; place-items: center; cursor: pointer; padding: 0;
+  touch-action: manipulation;
+}
+.lsk::after { content: ""; width: 1.3em; height: .18em; background: var(--key-text); border-radius: 1px; }
+.lsk:active { transform: translateY(.08em); box-shadow: none; }
+
+.screen {
+  background: radial-gradient(120% 90% at 70% 100%, #121416, var(--screen) 60%);
+  border-radius: 7px;
+  box-shadow: inset 0 0 0 2px #000, inset 0 0 1.2em rgba(0,0,0,.9);
+  font-family: var(--mono);
+  padding-inline: .45em;
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+}
+.ln { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; white-space: pre; line-height: 1; min-width: 0; }
+.ln .l { justify-self: start; }
+.ln .c { justify-self: center; }
+.ln .r { justify-self: end; }
+.ln.lbl { font-size: .74em; color: var(--label); letter-spacing: .02em; }
+.ln.dat { font-size: 1.04em; }
+.ln.ttl { font-size: 1.04em; color: var(--label); }
+.ln.sp { font-size: 1.04em; color: var(--label); }
+.cyan { color: var(--cyan); } .green { color: var(--green); } .amber { color: var(--amber); }
+.red { color: var(--red); } .dim { color: var(--dim); } .white { color: var(--label); }
+.small { font-size: .78em; }
+.boxes { display: inline-flex; gap: .08em; vertical-align: middle; }
+.boxes i { width: .52em; height: .82em; border: .1em solid var(--amber); display: inline-block; box-sizing: border-box; }
+.verdict { padding: .08em .35em; border: .1em solid currentColor; border-radius: .12em; font-weight: 700; letter-spacing: .06em; }
+.verdict.go { color: var(--green); }
+.verdict.nogo { color: var(--red); }
+.plot { grid-row: 2 / 13; display: grid; place-items: center; min-height: 0; }
+.plot svg { height: 100%; max-width: 100%; }
+.plot .ring { fill: none; stroke: var(--grid); stroke-width: .35; }
+.plot .rim { fill: url(#hatch); stroke: var(--dim); stroke-width: .5; }
+.plot .hatchbg { fill: var(--screen); }
+.plot .hatchln { stroke: var(--hatch); stroke-width: 1.1; }
+.plot .ok { fill: var(--screen); }
+.plot .lim { fill: none; stroke: var(--red); stroke-width: 1; stroke-linejoin: round; }
+.plot .tx { fill: var(--label); font-family: var(--mono); font-size: 4.2px; }
+.plot .txd { fill: var(--dim); font-family: var(--mono); font-size: 3.2px; }
+.plot .txl { fill: var(--red); font-family: var(--mono); font-size: 4px; font-weight: 700; }
+.plot .rwy { stroke: var(--label); stroke-width: .9; fill: none; }
+.plot .vec { stroke: var(--green); stroke-width: .6; stroke-dasharray: 1.4 1; }
+.plot .vec.bad { stroke: var(--red); }
+.plot .pt { fill: var(--green); }
+.plot .pt.bad { fill: var(--red); }
+.plot .gpt { fill: none; stroke: var(--label); stroke-width: .6; }
+
+/* ---------- keypad ---------- */
+.pad {
+  display: grid; grid-template-columns: 27% 1fr; gap: 4%;
+  padding: 6% 6% 0;
+}
+.fns { display: grid; grid-template-rows: repeat(4, 1fr); gap: .6em; }
+.keys { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr); gap: .6em; }
+.pad button {
+  font-family: var(--keyface); font-weight: 700; color: var(--key-text);
+  background: linear-gradient(180deg, #2a2c2f, var(--key));
+  border: 1px solid var(--key-edge);
+  box-shadow: 0 .14em 0 rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
+  cursor: pointer; touch-action: manipulation; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.pad button:active { transform: translateY(.1em); box-shadow: inset 0 1px 0 rgba(255,255,255,.06); }
+button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.fn { color: var(--fn-text) !important; font-size: 1.15em; border-radius: .3em; min-height: 2.6em; letter-spacing: .03em; }
+.k { aspect-ratio: 1; max-width: 100%; font-size: 1.45em; }
+.k.dig { border-radius: 50%; }
+.k.let { border-radius: .22em; }
+.k.clr { grid-column: 4 / 6; grid-row: 3 / 5; aspect-ratio: auto; border-radius: .22em; font-size: 1.15em; }
+.k.sm { font-size: 1.05em; }
+
+/* ---------- notes ---------- */
+.notes { display: grid; gap: 10px; font-size: 13px; line-height: 1.55; color: var(--foot); }
+.notes h2 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--label); margin: 0; font-weight: 600; }
+.notes dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
+.notes dt { color: var(--label); font-family: var(--mono); font-size: 12px; }
+.notes dd { margin: 0; min-width: 0; }
+.notes .warn { color: var(--amber); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <div class="cdu" role="application" aria-label="A380 takeoff crosswind CDU">
+    <div class="top">
+      <div class="lsks l" id="lsksL"></div>
+      <div class="screen" id="screen" aria-live="polite"></div>
+      <div class="lsks r" id="lsksR"></div>
+    </div>
+    <div class="pad">
+      <div class="fns">
+        <button class="fn" data-fn="ENG" id="fn-eng">ENG</button>
+        <button class="fn" data-fn="MAIN" id="fn-main">XWIND</button>
+        <button class="fn" data-fn="APT" id="fn-apt">APT</button>
+        <button class="fn" data-fn="ENV" id="fn-env">ENV</button>
+      </div>
+      <div class="keys" id="keys">
+        <button class="k dig" data-k="1">1</button><button class="k dig" data-k="2">2</button><button class="k dig" data-k="3">3</button>
+        <button class="k let" data-k="G">G</button><button class="k let" data-k="W">W</button>
+        <button class="k dig" data-k="4">4</button><button class="k dig" data-k="5">5</button><button class="k dig" data-k="6">6</button>
+        <button class="k let sm" data-k="DEL" aria-label="Delete last character">DEL</button><button class="k let" data-k="E">E</button>
+        <button class="k dig" data-k="7">7</button><button class="k dig" data-k="8">8</button><button class="k dig" data-k="9">9</button>
+        <button class="k let clr" data-k="CLR">CLR</button>
+        <button class="k dig" data-k=".">.</button><button class="k dig" data-k="0">0</button><button class="k dig" data-k="/">/</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="notes" aria-label="사용법과 판정 기준">
+    <h2>입력 방법</h2>
+    <dl>
+      <dt>250/28G35</dt><dd>바람 입력 후 WIND 옆 LSK (gust는 참조용)</dd>
+      <dt>334</dt><dd>RWY HDG 옆 LSK — 활주로 자방위 수동 입력</dd>
+      <dt>9W · 12E</dt><dd>WIND REF 옆 LSK — 편차 수동 입력 (TRUE로 전환)</dd>
+      <dt>빈 칸 + LSK</dt><dd>WIND REF: MAG/TRUE 전환 · APT/RWY: 공항 선택</dd>
+      <dt>CLR → LSK</dt><dd>해당 칸 삭제</dd>
+    </dl>
+    <h2>판정 기준</h2>
+    <div>정상풍만으로 판정 · 성분 0.1 kt 반올림 · TW 10.0 kt = NO GO · XW가 한계와 같으면 GO · 한계 표시는 0.1 kt 내림 · Gust는 참조 표시만.</div>
+    <div class="warn">Envelope은 Airbus FOT 999.0069/26 도표 판독값입니다(잠정). 참고용이며 AFM/FCOM과 회사 규정이 우선합니다.</div>
+  </section>
+</div>
+
+<script>
+const ENVELOPES = {"source": "Airbus FOT 999.0069/26 Rev 00 (12-OCT-2026), Illustration 1 & 2 — pixel-measured reading. PROVISIONAL until AFM advance copy is obtained.", "rules": {"tailwindLimitKt": 10, "tailwindAtLimitIsGo": false, "crosswindAtLimitIsGo": true, "gustUsedForVerdict": false, "componentRoundingKt": 0.1, "limitRounding": "floor to 0.1 kt (conservative)"}, "engines": {"RR": {"label": "RR TRENT 970/972", "fleet": "OZ", "xwMaxKt": 35, "xwAtTailwindLimitKt": 29}, "EA": {"label": "EA GP7270", "fleet": "KE", "xwMaxKt": 35, "xwAtTailwindLimitKt": 25}}};
+const APTS = {"note": "Runway headings are MAGNETIC. varDeg: East = +, West = -. MAG = TRUE - varDeg. 'verified' = true only when the MAG bearing is printed in the official AIP/FAA source. Cross-check against company Lido/Jeppesen charts before use.", "airports": {"RKSI": {"name": "INCHEON", "varDeg": -9, "varSource": "Korea AIP RKSI ADC, AIRAC AMDT 6/25 (eff 9 JUL 2025): VAR 9°W 2020, annual 6'W", "runways": [{"id": "15L", "magHdg": 154, "verified": true}, {"id": "15R", "magHdg": 154, "verified": true}, {"id": "16L", "magHdg": 154, "verified": true}, {"id": "16R", "magHdg": 154, "verified": true}, {"id": "33L", "magHdg": 334, "verified": true}, {"id": "33R", "magHdg": 334, "verified": true}, {"id": "34L", "magHdg": 334, "verified": true}, {"id": "34R", "magHdg": 334, "verified": true}], "hdgSource": "Captain-confirmed (company charts) 154°/334° MAG; consistent with true 144.8°/324.8° + 9°W (AIP ADC AMDT 6/25 prints 153°/333°)"}, "RJAA": {"name": "NARITA", "varDeg": -8, "varSource": "AIP Japan RJAA AD2.24-ADC-1 (EFF 10 JUL 2025): VAR 8°W 2023, annual 3'W", "runways": [{"id": "16L", "magHdg": 157, "verified": true}, {"id": "16R", "magHdg": 157, "verified": true}, {"id": "34L", "magHdg": 337, "verified": true}, {"id": "34R", "magHdg": 337, "verified": true}], "hdgSource": "Captain-confirmed (company charts) 157°/337° MAG; consistent with true 149.6°/329.6° + 7°W (AIP epoch 2008/2011)"}, "KLAX": {"name": "LOS ANGELES", "varDeg": 12, "varSource": "FAA d-TPP 2607 airport diagram: VAR 12°E", "runways": [{"id": "06L", "magHdg": 71, "verified": true}, {"id": "06R", "magHdg": 71, "verified": true}, {"id": "07L", "magHdg": 71, "verified": true}, {"id": "07R", "magHdg": 71, "verified": true}, {"id": "24L", "magHdg": 251, "verified": true}, {"id": "24R", "magHdg": 251, "verified": true}, {"id": "25L", "magHdg": 251, "verified": true}, {"id": "25R", "magHdg": 251, "verified": true}], "hdgSource": "FAA data 071°/251° MAG; cross-check true 083.0°/263.0° - 12°E = 071°/251°"}}};
+// A380 Takeoff Crosswind Envelope — calculation core
+// Rules (Captain Cho, 2026-11-06):
+//  - Verdict uses STEADY wind only. Gust components are reference only.
+//  - Components rounded half-up to 0.1 kt BEFORE the verdict.
+//  - Tailwind 10.0 kt = NO GO (strict <). Crosswind at limit = GO (<=).
+//  - Runway heading MAG. Wind MAG by default (ATIS); TRUE option converts with VAR.
+// All verdict arithmetic is done in integer tenths of a knot to avoid float error.
+
+const EPS = 1e-9;
+
+/** Round half-up to integer tenths of a knot (returns integer, e.g. 9.95 -> 100). */
+function toTenths(kt) {
+  return Math.floor(kt * 10 + 0.5 + EPS);
+}
+
+/** Normalize an angle to (-180, 180]. */
+function norm180(deg) {
+  let a = ((deg % 360) + 360) % 360;
+  return a > 180 ? a - 360 : a;
+}
+
+/** TRUE -> MAG. varDeg: East +, West -. */
+function trueToMag(trueDeg, varDeg) {
+  return ((trueDeg - varDeg) % 360 + 360) % 360;
+}
+
+/** Raw components. Returns { hw, xw, side } — hw > 0 headwind, < 0 tailwind. */
+function components(rwyMagHdg, windMagDir, speedKt) {
+  const theta = norm180(windMagDir - rwyMagHdg) * Math.PI / 180;
+  const hw = speedKt * Math.cos(theta);
+  const xwSigned = speedKt * Math.sin(theta); // + = from right
+  return { hw, xw: Math.abs(xwSigned), side: xwSigned > EPS ? 'R' : xwSigned < -EPS ? 'L' : '' };
+}
+
+/** Crosswind limit in tenths for a given tailwind (tenths), floored (conservative). */
+function xwLimitTenths(engine, twTenths, tailwindLimitKt = 10) {
+  const xwMax = engine.xwMaxKt * 10;
+  if (twTenths <= 0) return xwMax;
+  const xwAtTw = engine.xwAtTailwindLimitKt * 10;
+  const twLim = tailwindLimitKt * 10;
+  return Math.floor((xwMax * twLim - (xwMax - xwAtTw) * twTenths) / twLim);
+}
+
+/** Verdict on already-rounded components (tenths). */
+function judge(engine, xwTenths, twTenths, tailwindLimitKt = 10) {
+  const limit = xwLimitTenths(engine, twTenths, tailwindLimitKt);
+  const twOk = twTenths < tailwindLimitKt * 10;          // 10.0 kt = NO GO
+  const xwOk = xwTenths <= limit;                         // at limit = GO
+  return { go: twOk && xwOk, twOk, xwOk, xwLimitTenths: limit };
+}
+
+/** Full evaluation from pilot inputs. */
+function evaluate({ engine, rwyMagHdg, windDir, windSpd, gustSpd = null,
+                           windRef = 'MAG', varDeg = 0, tailwindLimitKt = 10 }) {
+  const windMag = windRef === 'TRUE' ? trueToMag(windDir, varDeg) : windDir;
+
+  const c = components(rwyMagHdg, windMag, windSpd);
+  const hwT = toTenths(Math.max(0, c.hw));
+  const twT = toTenths(Math.max(0, -c.hw));
+  const xwT = toTenths(c.xw);
+  const v = judge(engine, xwT, twT, tailwindLimitKt);
+
+  let gust = null;
+  if (gustSpd != null && gustSpd > windSpd) {
+    const g = components(rwyMagHdg, windMag, gustSpd);
+    gust = { hw: toTenths(Math.max(0, g.hw)) / 10, tw: toTenths(Math.max(0, -g.hw)) / 10,
+             xw: toTenths(g.xw) / 10 }; // reference only — never used for verdict
+  }
+
+  return {
+    windMag,
+    hw: hwT / 10, tw: twT / 10, xw: xwT / 10, side: c.side,
+    xwLimit: v.xwLimitTenths / 10,
+    go: v.go, twOk: v.twOk, xwOk: v.xwOk,
+    maxWindKt: maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt }),
+    gust,
+  };
+}
+
+/** Highest integer steady wind (kt) from this MAG direction that is still GO. */
+function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
+  let last = 0;
+  for (let v = 1; v <= 99; v++) {
+    const c = components(rwyMagHdg, windMag, v);
+    const r = judge(engine, toTenths(c.xw), toTenths(Math.max(0, -c.hw)), tailwindLimitKt);
+    if (!r.go) break;
+    last = v;
+  }
+  return last; // 99 means "no limit within 99 kt" (pure headwind)
+}
+
+
+(function () {
+  const E = ENVELOPES.engines, A = APTS.airports, TWLIM = ENVELOPES.rules.tailwindLimitKt;
+  const KEY = 'a380xw.v1';
+  const S = { page: 'ENG', eng: null, ref: 'MAG', varDeg: null, varMan: false, apt: null, rwy: null, hdg: null,
+              wdir: null, wspd: null, gust: null, sp: '', msg: '' };
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY) || '{}');
+    for (const k of ['eng', 'ref', 'apt', 'rwy', 'hdg', 'varDeg', 'varMan']) if (s[k] !== undefined) S[k] = s[k];
+  } catch (e) {}
+  if (S.eng && !E[S.eng]) S.eng = null;
+  if (S.apt && !A[S.apt]) { S.apt = null; S.rwy = null; }
+  S.page = S.eng ? 'MAIN' : 'ENG';
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify({ eng: S.eng, ref: S.ref, apt: S.apt, rwy: S.rwy, hdg: S.hdg, varDeg: S.varDeg, varMan: S.varMan })); } catch (e) {}
+  }
+
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const t = (s, cls = '') => `<span class="${cls}">${esc(s)}</span>`;
+  const boxes = n => `<span class="boxes">${'<i></i>'.repeat(n)}</span>`;
+  const ln = (cls, l = '', r = '', c = '') => `<div class="ln ${cls}"><span class="l">${l}</span><span class="c">${c}</span><span class="r">${r}</span></div>`;
+  const pad3 = n => String(Math.round(n)).padStart(3, '0');
+  const pad2 = n => String(n).padStart(2, '0');
+  const fmtHdg = h => (Number.isInteger(h) ? String(h).padStart(3, '0') : h.toFixed(1).padStart(5, '0')) + '°';
+  const fmtVar = v => v == null ? null : (Math.abs(v) % 1 ? Math.abs(v).toFixed(1) : Math.abs(v)) + (v < 0 ? 'W' : 'E');
+  const engShort = k => k === 'RR' ? 'RR T970/972' : 'EA GP7270';
+
+  function calc() {
+    if (!S.eng || S.hdg == null || S.wdir == null || S.wspd == null) return null;
+    if (S.ref === 'TRUE' && S.varDeg == null) return null;
+    return evaluate({ engine: E[S.eng], rwyMagHdg: S.hdg, windDir: S.wdir, windSpd: S.wspd, gustSpd: S.gust,
+                      windRef: S.ref, varDeg: S.varDeg || 0, tailwindLimitKt: TWLIM });
+  }
+
+  // ---------- pages: each returns 12 middle lines [lbl, dat] x 6 ----------
+  function pageEng() {
+    const sel = k => S.eng === k;
+    return { title: ln('ttl', '', '', 'ENGINE SELECT'), rows: [
+      ['ROLLS-ROYCE', 'FLEET'], [t('<TRENT 970/972', sel('RR') ? 'green' : 'cyan'), t('OZ', 'white')],
+      ['ENGINE ALLIANCE', 'FLEET'], [t('<GP7270', sel('EA') ? 'green' : 'cyan'), t('KE', 'white')],
+      ['', ''], ['', ''],
+      ['ENVELOPE DATA', ''], [t('FOT 999.0069/26', 'green small'), ''],
+      ['STATUS', ''], [t('PROVISIONAL CHART READ', 'amber small'), ''],
+      ['', ''], [S.eng ? t('<RETURN', 'white') : '', ''],
+    ] };
+  }
+
+  function pageMain() {
+    const r = calc();
+    const dash = t('---', 'dim');
+    const refDat = S.ref === 'MAG'
+      ? t('MAG', 'cyan') + t('/TRUE', 'cyan small') + t('>', 'white')
+      : t('MAG/', 'cyan small') + t('TRUE', 'cyan') + t('>', 'white');
+    const varLbl = S.ref === 'TRUE' ? 'VAR ' + (fmtVar(S.varDeg) ?? '') : '';
+    const refLbl = S.ref === 'TRUE' && S.varDeg == null ? 'VAR ' + boxes(3) : esc(varLbl ? 'REF ' + varLbl : 'WIND REF');
+    const aptDat = S.hdg == null
+      ? t('<', 'white') + boxes(4) + t('/', 'white') + boxes(3)
+      : t('<' + (S.apt || '----') + '/' + (S.rwy || 'MAN'), 'cyan');
+    const hdgDat = S.hdg == null ? boxes(3) : t(fmtHdg(S.hdg), 'cyan');
+    const windLbl = S.ref === 'TRUE' ? 'WIND (T)' + (r ? ' >' + pad3(r.windMag % 360 || 360) + 'M' : '') : 'WIND (M)';
+    const windDat = S.wdir == null ? boxes(3) + t('/', 'white') + boxes(2)
+      : t(pad3(S.wdir) + '/' + pad2(S.wspd), 'cyan');
+    const gustDat = S.gust == null ? t('--', 'cyan') : t('G' + S.gust, 'cyan');
+
+    let hwLbl = 'HW/TW', hwDat = dash, xwDat = dash, limDat = dash, gDat = dash, maxDat = dash,
+        vLbl = 'VERDICT', vDat = t('----', 'dim');
+    if (r) {
+      hwLbl = r.tw > 0 ? 'TAILWIND' : 'HEADWIND';
+      hwDat = r.tw > 0 ? t(r.tw.toFixed(1), r.twOk ? 'green' : 'red') : t(r.hw.toFixed(1), 'green');
+      xwDat = t((r.side ? r.side + ' ' : '') + r.xw.toFixed(1), r.xwOk ? 'green' : 'red');
+      limDat = t(r.xwLimit.toFixed(1), 'green');
+      if (r.gust) gDat = t(r.gust.xw.toFixed(1) + '/' + (r.gust.tw > 0 ? 'T' + r.gust.tw.toFixed(1) : 'H' + r.gust.hw.toFixed(1)), 'white small');
+      maxDat = t(r.maxWindKt >= 99 ? 'NO LIMIT' : r.maxWindKt + ' KT', 'green');
+      vLbl = r.go ? 'TAKEOFF' : (!r.twOk ? 'TW LIMIT' : 'XW LIMIT');
+      vDat = r.go ? '<span class="verdict go">GO</span>' : '<span class="verdict nogo">NO GO</span>';
+    }
+    return {
+      title: ln('ttl', '', t(S.eng, 'green small'), 'TO XWIND'),
+      rows: [
+        ['ENGINE', refLbl], [t('<' + engShort(S.eng), 'cyan'), refDat],
+        ['APT/RWY', 'RWY HDG(M)'], [aptDat, hdgDat],
+        [esc(windLbl), 'GUST'], [windDat, gustDat],
+        [hwLbl, 'CROSSWIND'], [hwDat, xwDat],
+        ['XW LIMIT', 'GUST XW/TW REF'], [limDat, gDat],
+        ['MAX WIND', vLbl], [maxDat, vDat],
+      ], rawLabels: true,
+    };
+  }
+
+  function pageApt() {
+    const ids = Object.keys(A);
+    const rows = [];
+    for (let i = 0; i < 6; i++) {
+      const id = ids[i];
+      if (id) {
+        rows.push([A[id].name, 'VAR'], [t('<' + id, S.apt === id ? 'green' : 'cyan'), t(fmtVar(A[id].varDeg), 'white')]);
+      } else if (i === 5) {
+        rows.push(['', ''], [t('<RETURN', 'white'), '']);
+      } else rows.push(['', ''], ['', '']);
+    }
+    return { title: ln('ttl', '', '', 'AIRPORT'), rows };
+  }
+
+  function pageRwy() {
+    const a = A[S.apt], rw = a.runways, half = Math.ceil(rw.length / 2);
+    const rows = [];
+    for (let i = 0; i < 6; i++) {
+      const L = i < 4 ? rw[i] : null, R = i < 4 ? rw[half + i] : null;
+      const inL = L && i < half, inR = R && half + i < rw.length;
+      const cl = x => S.rwy === x.id && S.apt ? 'green' : 'cyan';
+      if (i === 5) { rows.push(['', ''], [t('<RETURN', 'white'), '']); continue; }
+      rows.push(['', ''], [inL ? t('<' + L.id + ' ' + fmtHdg(L.magHdg), cl(L)) : '', inR ? t(fmtHdg(R.magHdg) + ' ' + R.id + '>', cl(R)) : '']);
+    }
+    return { title: ln('ttl', t(S.apt, 'green small'), '', 'RUNWAY'), rows };
+  }
+
+  function plotSVG(r) {
+    const e = E[S.eng], xm = e.xwMaxKt, x10 = e.xwAtTailwindLimitKt, tw = TWLIM, R = 50;
+    let s = '<svg viewBox="-62 -62 124 124" role="img" aria-label="Takeoff wind envelope">';
+    s += '<defs><clipPath id="cc"><circle r="' + R + '"/></clipPath>' +
+         '<pattern id="hatch" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
+         '<rect class="hatchbg" width="3" height="3"/><line class="hatchln" x1="0" y1="0" x2="0" y2="3"/></pattern></defs>';
+    s += '<circle class="rim" r="' + R + '"/>';
+    const okPts = [[-xm, -70], [xm, -70], [xm, 0], [x10, tw], [-x10, tw], [-xm, 0]].map(p => p.join(',')).join(' ');
+    s += '<polygon class="ok" clip-path="url(#cc)" points="' + okPts + '"/>';
+    for (let k = 10; k <= R; k += 10) s += '<circle class="ring" r="' + k + '"/>';
+    for (let a = 0; a < 360; a += 30) {
+      const rad = a * Math.PI / 180;
+      s += '<line class="ring" x1="0" y1="0" x2="' + (R * Math.sin(rad)).toFixed(2) + '" y2="' + (-R * Math.cos(rad)).toFixed(2) + '"/>';
+    }
+    const limPts = [[-xm, -70], [-xm, 0], [-x10, tw], [x10, tw], [xm, 0], [xm, -70]].map(p => p.join(',')).join(' ');
+    s += '<polyline class="lim" clip-path="url(#cc)" points="' + limPts + '"/>';
+    for (let k = 10; k <= 40; k += 10) s += '<text class="txd" x="1" y="' + (-k - .8) + '">' + k + '</text>';
+    s += '<text class="txl" x="' + (-xm - 1.2) + '" y="-2" text-anchor="end">' + xm + '</text>';
+    s += '<text class="txl" x="' + (xm + 1.2) + '" y="-2">' + xm + '</text>';
+    s += '<text class="txl" x="' + (-x10) + '" y="' + (tw + 5.2) + '" text-anchor="middle">' + x10 + '</text>';
+    s += '<text class="txl" x="' + x10 + '" y="' + (tw + 5.2) + '" text-anchor="middle">' + x10 + '</text>';
+    s += '<text class="txl" x="0" y="' + (tw + 5.2) + '" text-anchor="middle">' + tw + '</text>';
+    s += '<text class="tx" x="0" y="-53" text-anchor="middle">HW</text>';
+    s += '<text class="tx" x="0" y="57" text-anchor="middle">TW</text>';
+    s += '<text class="tx" x="-55" y="1.5" text-anchor="middle">L</text>';
+    s += '<text class="tx" x="55" y="1.5" text-anchor="middle">R</text>';
+    s += '<path class="rwy" d="M0 7 V-7 M-2 -4 L0 -7 L2 -4"/>';
+    if (r) {
+      const th = norm180(r.windMag - S.hdg) * Math.PI / 180;
+      const P = v => { const k = Math.min(v, 56); return [k * Math.sin(th), -k * Math.cos(th)]; };
+      const [x, y] = P(S.wspd), bad = r.go ? '' : ' bad';
+      s += '<line class="vec' + bad + '" x1="0" y1="0" x2="' + x.toFixed(2) + '" y2="' + y.toFixed(2) + '"/>';
+      if (S.gust != null) { const [gx, gy] = P(S.gust); s += '<circle class="gpt" r="1.6" cx="' + gx.toFixed(2) + '" cy="' + gy.toFixed(2) + '"/>'; }
+      s += '<circle class="pt' + bad + '" r="1.8" cx="' + x.toFixed(2) + '" cy="' + y.toFixed(2) + '"/>';
+    }
+    return s + '</svg>';
+  }
+
+  // ---------- render ----------
+  const scr = document.getElementById('screen');
+  function render() {
+    const spText = S.msg ? t(S.msg, 'white') : t(S.sp, 'white');
+    if (S.page === 'ENV') {
+      const r = calc();
+      const head = ln('ttl', t(S.rwy ? (S.apt || '') + ' ' + S.rwy : '', 'green small'), t(S.eng, 'green small'), 'ENVELOPE');
+      const read = r
+        ? ln('dat', t((r.tw > 0 ? 'TW ' + r.tw.toFixed(1) : 'HW ' + r.hw.toFixed(1)) + '  XW ' + r.xw.toFixed(1), 'green small'),
+             r.go ? '<span class="verdict go small">GO</span>' : '<span class="verdict nogo small">NO GO</span>',
+             t('LIM ' + r.xwLimit.toFixed(1), 'green small'))
+        : ln('dat', t('ENTER WIND ON XWIND PAGE', 'dim small'));
+      scr.innerHTML = head + '<div class="plot">' + plotSVG(r) + '</div>' + read + ln('sp', spText);
+      return;
+    }
+    const p = S.page === 'ENG' ? pageEng() : S.page === 'APT' ? pageApt() : S.page === 'RWY' ? pageRwy() : pageMain();
+    let html = p.title;
+    p.rows.forEach((pair, i) => {
+      const isLbl = i % 2 === 0;
+      const [l, r] = pair;
+      html += isLbl ? ln('lbl', p.rawLabels ? l : esc(l), p.rawLabels ? r : esc(r)) : ln('dat', l, r);
+    });
+    scr.innerHTML = html + ln('sp', spText);
+  }
+
+  // ---------- input ----------
+  const err = m => { S.msg = m; render(); };
+  const ok = () => { S.sp = ''; S.msg = ''; save(); render(); };
+  const go = pg => { S.page = pg; S.msg = ''; render(); };
+
+  function lskMain(id) {
+    const sp = S.sp;
+    switch (id) {
+      case 'L1': return go('ENG');
+      case 'R1':
+        if (!sp) { S.ref = S.ref === 'MAG' ? 'TRUE' : 'MAG'; return ok(); }
+        if (sp === 'CLR') { S.varMan = false; S.varDeg = S.apt ? A[S.apt].varDeg : null; return ok(); }
+        { const m = sp.match(/^(\d{1,2}(?:\.\d)?)([EW])$/);
+          if (!m) return err('FORMAT ERROR');
+          const v = +m[1]; if (v > 30) return err('ENTRY OUT OF RANGE');
+          S.varDeg = m[2] === 'W' ? -v : v; S.varMan = true; S.ref = 'TRUE'; return ok(); }
+      case 'L2':
+        if (!sp) return go('APT');
+        return err('FORMAT ERROR');
+      case 'R2':
+        if (sp === 'CLR') { S.hdg = null; S.rwy = null; return ok(); }
+        { const m = sp.match(/^\d{1,3}(?:\.\d)?$/);
+          if (!m) return err(sp ? 'FORMAT ERROR' : '');
+          const v = +sp; if (v < 1 || v > 360) return err('ENTRY OUT OF RANGE');
+          S.hdg = v; S.rwy = null; return ok(); }
+      case 'L3':
+        if (sp === 'CLR') { S.wdir = S.wspd = S.gust = null; return ok(); }
+        { const m = sp.match(/^(\d{1,3})?(?:\/(\d{1,2})(?:G(\d{1,2}))?)?$/);
+          if (!sp || !m || (m[1] == null && m[2] == null)) return err(sp ? 'FORMAT ERROR' : '');
+          const d = m[1] != null ? +m[1] : S.wdir, v = m[2] != null ? +m[2] : S.wspd;
+          if (d == null || v == null) return err('FORMAT ERROR');
+          if (d > 360 || (d === 0 && v > 0)) return err('ENTRY OUT OF RANGE');
+          const g = m[3] != null ? +m[3] : (m[2] != null ? null : S.gust);
+          if (g != null && g <= v) return err('ENTRY OUT OF RANGE');
+          S.wdir = d; S.wspd = v; S.gust = g; return ok(); }
+      case 'R3':
+        if (sp === 'CLR') { S.gust = null; return ok(); }
+        { if (!/^\d{1,2}$/.test(sp)) return err(sp ? 'FORMAT ERROR' : '');
+          const g = +sp; if (S.wspd != null && g <= S.wspd) return err('ENTRY OUT OF RANGE');
+          S.gust = g; return ok(); }
+      case 'R6': if (calc()) return go('ENV'); return;
+    }
+  }
+
+  function lsk(id) {
+    if (S.page === 'ENG') {
+      if (id === 'L1') { S.eng = 'RR'; save(); return go('MAIN'); }
+      if (id === 'L2') { S.eng = 'EA'; save(); return go('MAIN'); }
+      if (id === 'L6' && S.eng) return go('MAIN');
+      return;
+    }
+    if (S.page === 'MAIN') return lskMain(id);
+    if (S.page === 'APT') {
+      const ids = Object.keys(A), i = +id[1] - 1;
+      if (id[0] === 'L' && ids[i]) {
+        S.apt = ids[i]; S.varDeg = A[S.apt].varDeg; S.varMan = false; save(); return go('RWY');
+      }
+      if (id === 'L6') return go('MAIN');
+      return;
+    }
+    if (S.page === 'RWY') {
+      const rw = A[S.apt].runways, half = Math.ceil(rw.length / 2), i = +id[1] - 1;
+      if (id === 'L6') return go('APT');
+      if (i > 3) return;
+      const x = id[0] === 'L' ? (i < half ? rw[i] : null) : rw[half + i];
+      if (!x) return;
+      S.rwy = x.id; S.hdg = x.magHdg; save(); return go('MAIN');
+    }
+  }
+
+  function key(k) {
+    if (k === 'CLR') {
+      if (S.msg) S.msg = '';
+      else if (S.sp && S.sp !== 'CLR') S.sp = '';
+      else S.sp = S.sp === 'CLR' ? '' : 'CLR';
+      return render();
+    }
+    if (k === 'DEL') {
+      if (S.msg) S.msg = ''; else S.sp = S.sp === 'CLR' ? '' : S.sp.slice(0, -1);
+      return render();
+    }
+    S.msg = ''; if (S.sp === 'CLR') S.sp = '';
+    if (S.sp.length < 20) S.sp += k;
+    render();
+  }
+
+  function fn(f) {
+    if (f !== 'ENG' && !S.eng) { S.page = 'ENG'; return err('SELECT ENGINE'); }
+    if (f === 'ENV' && !calc()) { S.page = 'MAIN'; return err('ENTER RWY AND WIND'); }
+    go(f);
+  }
+
+  // ---------- wire up ----------
+  const mk = (side) => {
+    const col = document.getElementById(side === 'L' ? 'lsksL' : 'lsksR');
+    for (let i = 1; i <= 6; i++) {
+      const b = document.createElement('button');
+      b.className = 'lsk'; b.id = 'lsk-' + side + i; b.setAttribute('aria-label', 'Line select key ' + side + i);
+      b.style.gridRow = String(i * 2 + 1);
+      b.addEventListener('click', () => lsk(side + i));
+      col.appendChild(b);
+    }
+  };
+  mk('L'); mk('R');
+  document.querySelectorAll('[data-k]').forEach(b => b.addEventListener('click', () => key(b.dataset.k)));
+  document.querySelectorAll('[data-fn]').forEach(b => b.addEventListener('click', () => fn(b.dataset.fn)));
+  document.addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key;
+    if (/^[0-9./]$/.test(k)) { key(k); e.preventDefault(); }
+    else if (/^[gweGWE]$/.test(k)) { key(k.toUpperCase()); e.preventDefault(); }
+    else if (k === 'Backspace') { key('DEL'); e.preventDefault(); }
+    else if (k === 'Escape' || k === 'Delete') { key('CLR'); e.preventDefault(); }
+  });
+  render();
+})();
+</script>

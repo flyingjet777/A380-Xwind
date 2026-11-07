@@ -1,0 +1,129 @@
+{
+  "note": "Runway headings are MAGNETIC. varDeg: East = +, West = -. MAG = TRUE - varDeg. 'verified' = true only when the MAG bearing is printed in the official AIP/FAA source. Cross-check against company Lido/Jeppesen charts before use.",
+  "airports": {
+    "RKSI": {
+      "name": "INCHEON",
+      "varDeg": -9,
+      "varSource": "Korea AIP RKSI ADC, AIRAC AMDT 6/25 (eff 9 JUL 2025): VAR 9°W 2020, annual 6'W",
+      "runways": [
+        {
+          "id": "15L",
+          "magHdg": 154,
+          "verified": true
+        },
+        {
+          "id": "15R",
+          "magHdg": 154,
+          "verified": true
+        },
+        {
+          "id": "16L",
+          "magHdg": 154,
+          "verified": true
+        },
+        {
+          "id": "16R",
+          "magHdg": 154,
+          "verified": true
+        },
+        {
+          "id": "33L",
+          "magHdg": 334,
+          "verified": true
+        },
+        {
+          "id": "33R",
+          "magHdg": 334,
+          "verified": true
+        },
+        {
+          "id": "34L",
+          "magHdg": 334,
+          "verified": true
+        },
+        {
+          "id": "34R",
+          "magHdg": 334,
+          "verified": true
+        }
+      ],
+      "hdgSource": "Captain-confirmed (company charts) 154°/334° MAG; consistent with true 144.8°/324.8° + 9°W (AIP ADC AMDT 6/25 prints 153°/333°)"
+    },
+    "RJAA": {
+      "name": "NARITA",
+      "varDeg": -8,
+      "varSource": "AIP Japan RJAA AD2.24-ADC-1 (EFF 10 JUL 2025): VAR 8°W 2023, annual 3'W",
+      "runways": [
+        {
+          "id": "16L",
+          "magHdg": 157,
+          "verified": true
+        },
+        {
+          "id": "16R",
+          "magHdg": 157,
+          "verified": true
+        },
+        {
+          "id": "34L",
+          "magHdg": 337,
+          "verified": true
+        },
+        {
+          "id": "34R",
+          "magHdg": 337,
+          "verified": true
+        }
+      ],
+      "hdgSource": "Captain-confirmed (company charts) 157°/337° MAG; consistent with true 149.6°/329.6° + 7°W (AIP epoch 2008/2011)"
+    },
+    "KLAX": {
+      "name": "LOS ANGELES",
+      "varDeg": 12,
+      "varSource": "FAA d-TPP 2607 airport diagram: VAR 12°E",
+      "runways": [
+        {
+          "id": "06L",
+          "magHdg": 71,
+          "verified": true
+        },
+        {
+          "id": "06R",
+          "magHdg": 71,
+          "verified": true
+        },
+        {
+          "id": "07L",
+          "magHdg": 71,
+          "verified": true
+        },
+        {
+          "id": "07R",
+          "magHdg": 71,
+          "verified": true
+        },
+        {
+          "id": "24L",
+          "magHdg": 251,
+          "verified": true
+        },
+        {
+          "id": "24R",
+          "magHdg": 251,
+          "verified": true
+        },
+        {
+          "id": "25L",
+          "magHdg": 251,
+          "verified": true
+        },
+        {
+          "id": "25R",
+          "magHdg": 251,
+          "verified": true
+        }
+      ],
+      "hdgSource": "FAA data 071°/251° MAG; cross-check true 083.0°/263.0° - 12°E = 071°/251°"
+    }
+  }
+}

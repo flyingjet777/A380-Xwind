@@ -1,0 +1,25 @@
+{
+  "source": "Airbus FOT 999.0069/26 Rev 00 (12-OCT-2026), Illustration 1 & 2 — pixel-measured reading. PROVISIONAL until AFM advance copy is obtained.",
+  "rules": {
+    "tailwindLimitKt": 10,
+    "tailwindAtLimitIsGo": false,
+    "crosswindAtLimitIsGo": true,
+    "gustUsedForVerdict": false,
+    "componentRoundingKt": 0.1,
+    "limitRounding": "floor to 0.1 kt (conservative)"
+  },
+  "engines": {
+    "RR": {
+      "label": "RR TRENT 970/972",
+      "fleet": "OZ",
+      "xwMaxKt": 35,
+      "xwAtTailwindLimitKt": 29
+    },
+    "EA": {
+      "label": "EA GP7270",
+      "fleet": "KE",
+      "xwMaxKt": 35,
+      "xwAtTailwindLimitKt": 25
+    }
+  }
+}
