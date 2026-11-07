@@ -394,7 +394,10 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
     const tc = 180 - Math.atan2(x10, TWLIM) * 180 / Math.PI;   // angle off nose of the XW/TW corner
     const fmt = (side, p) => side + ' ' + pad3(p.d) + '°/' + pad2(p.v);
     const r = calc();
-    const wDat = r ? t(pad3(Math.round(r.windMag) || 360) + '/' + pad2(S.wspd), 'cyan') : t('---', 'dim');
+    const wDat = S.wdir == null ? boxes(3) + t('/', 'white') + boxes(2)
+      : t(pad3(S.wdir) + '/' + pad2(S.wspd) + (S.gust != null ? 'G' + S.gust : ''), 'cyan');
+    const comp = r ? t((r.tw > 0 ? 'TW ' + r.tw.toFixed(1) : 'HW ' + r.hw.toFixed(1)) + ' XW ' + (r.side ? r.side + ' ' : '') + r.xw.toFixed(1), r.go ? 'green' : 'red') : '';
+    const limT = r ? t('LIM ' + r.xwLimit.toFixed(1), 'green') : '';
     const vDat = r ? (r.go ? '<span class="verdict go">GO</span>' : '<span class="verdict nogo">NO GO</span>') : '';
     return {
       title: ln('ttl', '', t(S.eng, 'green small'), 'ENVELOPE'),
@@ -403,9 +406,9 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
         ['APT/RWY', 'RWY HDG(M)'], [t((S.apt || '----') + '/' + (S.rwy || 'MAN'), 'green'), t(fmtHdg(h), 'green')],
         ['L XW ' + e.xwMaxKt, 'R XW ' + e.xwMaxKt], [t(fmt('L', pt(-90)), 'green'), t(fmt('R', pt(90)), 'green')],
         ['L XW ' + x10 + '/TW ' + TWLIM, 'R XW ' + x10 + '/TW ' + TWLIM], [t(fmt('L', pt(-tc)), 'green'), t(fmt('R', pt(tc)), 'green')],
-        ['WIND (M)', r ? (r.go ? 'TAKEOFF' : (!r.twOk ? 'TW LIMIT' : 'XW LIMIT')) : ''], [wDat, vDat],
-        ['', ''], [t('<XWIND', 'white'), t('PLOT>', 'white')],
-      ],
+        [S.ref === 'TRUE' ? 'WIND (T)' : 'WIND (M)', r ? (r.go ? 'TAKEOFF' : (!r.twOk ? 'TW LIMIT' : 'XW LIMIT')) : ''], [wDat, vDat],
+        [comp, limT], [t('<XWIND', 'white'), t('PLOT>', 'white')],
+      ], rawLabels: true,
     };
   }
 
@@ -477,6 +480,18 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
   const ok = () => { S.sp = ''; S.msg = ''; save(); render(); };
   const go = pg => { S.page = pg; S.msg = ''; render(); };
 
+  function enterWind(sp) {
+    if (sp === 'CLR') { S.wdir = S.wspd = S.gust = null; return ok(); }
+    { const m = sp.match(/^(\d{1,3})?(?:\/(\d{1,2})(?:G(\d{1,2}))?)?$/);
+      if (!sp || !m || (m[1] == null && m[2] == null)) return err(sp ? 'FORMAT ERROR' : '');
+      const d = m[1] != null ? +m[1] : S.wdir, v = m[2] != null ? +m[2] : S.wspd;
+      if (d == null || v == null) return err('FORMAT ERROR');
+      if (d > 360 || (d === 0 && v > 0)) return err('ENTRY OUT OF RANGE');
+      const g = m[3] != null ? +m[3] : (m[2] != null ? null : S.gust);
+      if (g != null && g <= v) return err('ENTRY OUT OF RANGE');
+      S.wdir = d; S.wspd = v; S.gust = g; return ok(); }
+  }
+
   function lskMain(id) {
     const sp = S.sp;
     switch (id) {
@@ -497,16 +512,7 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
           if (!m) return err(sp ? 'FORMAT ERROR' : '');
           const v = +sp; if (v < 1 || v > 360) return err('ENTRY OUT OF RANGE');
           S.hdg = v; S.rwy = null; return ok(); }
-      case 'L3':
-        if (sp === 'CLR') { S.wdir = S.wspd = S.gust = null; return ok(); }
-        { const m = sp.match(/^(\d{1,3})?(?:\/(\d{1,2})(?:G(\d{1,2}))?)?$/);
-          if (!sp || !m || (m[1] == null && m[2] == null)) return err(sp ? 'FORMAT ERROR' : '');
-          const d = m[1] != null ? +m[1] : S.wdir, v = m[2] != null ? +m[2] : S.wspd;
-          if (d == null || v == null) return err('FORMAT ERROR');
-          if (d > 360 || (d === 0 && v > 0)) return err('ENTRY OUT OF RANGE');
-          const g = m[3] != null ? +m[3] : (m[2] != null ? null : S.gust);
-          if (g != null && g <= v) return err('ENTRY OUT OF RANGE');
-          S.wdir = d; S.wspd = v; S.gust = g; return ok(); }
+      case 'L3': return enterWind(sp);
       case 'R3':
         if (sp === 'CLR') { S.gust = null; return ok(); }
         { if (!/^\d{1,2}$/.test(sp)) return err(sp ? 'FORMAT ERROR' : '');
@@ -524,7 +530,7 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
       return;
     }
     if (S.page === 'MAIN') return lskMain(id);
-    if (S.page === 'ENV') { if (id === 'L6') return go('MAIN'); if (id === 'R6') return go('PLOT'); if (id === 'L2') return go('APT'); return; }
+    if (S.page === 'ENV') { if (id === 'L5') return enterWind(S.sp); if (id === 'L6') return go('MAIN'); if (id === 'R6') return go('PLOT'); if (id === 'L2') return go('APT'); return; }
     if (S.page === 'PLOT') { if (id === 'L6' || id === 'R6') return go('ENV'); return; }
     if (S.page === 'APT') {
       const ids = Object.keys(A), i = +id[1] - 1;
