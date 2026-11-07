@@ -340,7 +340,7 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
       xwDat = t((r.side ? r.side + ' ' : '') + r.xw.toFixed(1), r.xwOk ? 'green' : 'red');
       limDat = t(r.xwLimit.toFixed(1), 'green');
       if (r.gust) gDat = t(r.gust.xw.toFixed(1) + '/' + (r.gust.tw > 0 ? 'T' + r.gust.tw.toFixed(1) : 'H' + r.gust.hw.toFixed(1)), 'white small');
-      maxDat = t(r.maxWindKt >= 99 ? 'NO LIMIT' : r.maxWindKt + ' KT', 'green');
+      maxDat = r.maxWindKt >= 99 ? t('NO LIMIT', 'green') : t('upto ', 'green small') + t(r.maxWindKt + ' KT', 'green');
       vLbl = r.go ? 'TAKEOFF' : (!r.twOk ? 'TW LIMIT' : 'XW LIMIT');
       vDat = r.go ? '<span class="verdict go">GO</span>' : '<span class="verdict nogo">NO GO</span>';
     }
