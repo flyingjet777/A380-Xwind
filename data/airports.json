@@ -171,35 +171,35 @@
         {
           "id": "01",
           "magHdg": 15,
-          "verified": false
+          "verified": true
         },
         {
           "id": "02L",
           "magHdg": 15,
-          "verified": false
+          "verified": true
         },
         {
           "id": "02R",
           "magHdg": 15,
-          "verified": false
+          "verified": true
         },
         {
           "id": "19",
           "magHdg": 195,
-          "verified": false
+          "verified": true
         },
         {
           "id": "20R",
           "magHdg": 195,
-          "verified": false
+          "verified": true
         },
         {
           "id": "20L",
           "magHdg": 195,
-          "verified": false
+          "verified": true
         }
       ],
-      "hdgSource": "COMPUTED: true 014.4°/194.4° (AIP Thailand SUP 37/24) + 0.6°W = 015/195. Designators after 3 OCT 2024: 01/19 (ex 01R/19L, 4000 m), 02R/20L (ex 01L/19R, 3700 m), 02L/20R (new, 4000 m). VERIFY against company chart."
+      "hdgSource": "Captain-confirmed 015°/195° MAG; consistent with true 014.4°/194.4° (AIP Thailand SUP 37/24) + 0.6°W. Designators after 3 OCT 2024: 01/19, 02R/20L, 02L/20R."
     }
   }
 }

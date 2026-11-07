@@ -12,7 +12,7 @@ A380 이륙 측풍제한(Airbus FOT 999.0069/26) CDU 스타일 판정 web app. �
 
 ## 공항 프리셋 (기장님 확인값)
 RKSI 154/334 (VAR 9W) · RJAA 157/337 (VAR 8W) · KLAX 071/251 (VAR 12E)
-YSSY 061/241, 155/335 (VAR 13E, ERSA) · VTBS 015/195 (VAR 0.6W, 계산값 — 기장님 확인 필요)
+YSSY 061/241, 155/335 (VAR 13E, ERSA) · VTBS 015/195 (VAR 0.6W, 기장님 확인)
 APT 페이지: 10개/페이지 (L1-L5, R1-R5), R6 MORE> 로 페이지 순환
 
 ## 작업 방식
