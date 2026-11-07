@@ -92,6 +92,7 @@ export function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
 /**
  * Parse scratchpad wind entry. Accepts:
  *   170/30, 170/30G35, 17030, 17030G35 (METAR style, 3-digit dir + 2-digit speed),
+ *   0805, 0805G15 (2-digit dir in tens + 2-digit speed -> 080/05),
  *   170 (direction only), /30 (speed only, keeps direction; clears gust).
  * prev = { wdir, wspd, gust } current values. Returns { wdir, wspd, gust } or { error }.
  */
@@ -99,8 +100,10 @@ export function parseWind(sp, prev = {}) {
   const s = String(sp || '').trim().toUpperCase();
   if (!s) return { error: '' };
   const metar = s.match(/^(\d{3})(\d{2})(?:G(\d{2}))?$/);
+  const short = s.match(/^(\d{2})(\d{2})(?:G(\d{2}))?$/);   // 0805 -> 080/05 (direction in tens)
   const m = metar ? [s, metar[1], metar[2], metar[3]]
-                  : s.match(/^(\d{1,3})?(?:\/(\d{1,2})(?:G(\d{1,2}))?)?$/);
+          : short ? [s, String(+short[1] * 10), short[2], short[3]]
+          : s.match(/^(\d{1,3})?(?:\/(\d{1,2})(?:G(\d{1,2}))?)?$/);
   if (!m || (m[1] == null && m[2] == null)) return { error: 'FORMAT ERROR' };
   const d = m[1] != null ? +m[1] : prev.wdir, v = m[2] != null ? +m[2] : prev.wspd;
   if (d == null || v == null) return { error: 'FORMAT ERROR' };

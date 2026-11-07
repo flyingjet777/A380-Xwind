@@ -86,6 +86,11 @@ test('Wind entry formats: 170/30, 17030, 17030G35, 170/30G35', async () => {
   assert.deepEqual(parseWind('180', { wdir: 170, wspd: 30, gust: 35 }), { wdir: 180, wspd: 30, gust: 35 });
   assert.equal(parseWind('17030G25').error, 'ENTRY OUT OF RANGE');
   assert.equal(parseWind('37030').error, 'ENTRY OUT OF RANGE');
-  assert.equal(parseWind('1703').error, 'FORMAT ERROR');
+  assert.deepEqual(parseWind('0805'), { wdir: 80, wspd: 5, gust: null });
+  assert.deepEqual(parseWind('1703'), { wdir: 170, wspd: 3, gust: null });
+  assert.deepEqual(parseWind('3615G25'), { wdir: 360, wspd: 15, gust: 25 });
+  assert.equal(parseWind('3705').error, 'ENTRY OUT OF RANGE');
+  assert.equal(parseWind('08051').error, undefined);  // 5 digits = METAR 080/51
+  assert.equal(parseWind('080', { wdir: 170, wspd: 30 }).wdir, 80);  // 3 digits = direction only
   assert.equal(parseWind('170300').error, 'FORMAT ERROR');
 });
