@@ -132,7 +132,7 @@
       "runways": [
         {
           "id": "07",
-          "magHdg": 61,
+          "magHdg": 62,
           "verified": true
         },
         {
@@ -147,7 +147,7 @@
         },
         {
           "id": "25",
-          "magHdg": 241,
+          "magHdg": 242,
           "verified": true
         },
         {
@@ -161,7 +161,7 @@
           "verified": true
         }
       ],
-      "hdgSource": "Airservices ERSA FAC YSSY (03 SEP 2026): 07/25 061, 16L/34R 155, 16R/34L 155 (MAG). A380 normally 16R/34L (3962 m); 07/25 and 16L/34R are 45 m wide."
+      "hdgSource": "07/25 062/242 MAG captain-confirmed (ERSA prints 061; true 074.1°). 16L/34R, 16R/34L 155/335 MAG per Airservices ERSA FAC (03 SEP 2026). A380 normally 16R/34L."
     },
     "VTBS": {
       "name": "BANGKOK",
