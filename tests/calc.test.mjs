@@ -75,3 +75,17 @@ test('ENV points RKSI 334: RR L244/35 R064/35, corner L225/30 R083/30; EA corner
   assert.equal(mw(RR, 225), 30); assert.equal(mw(RR, 83), 30);
   assert.equal(mw(EA, 222), 26); assert.equal(mw(EA, 86), 26);
 });
+
+test('Wind entry formats: 170/30, 17030, 17030G35, 170/30G35', async () => {
+  const { parseWind } = await import('../js/calc.js');
+  assert.deepEqual(parseWind('170/30'), { wdir: 170, wspd: 30, gust: null });
+  assert.deepEqual(parseWind('17030'), { wdir: 170, wspd: 30, gust: null });
+  assert.deepEqual(parseWind('17030G35'), { wdir: 170, wspd: 30, gust: 35 });
+  assert.deepEqual(parseWind('170/30G35'), { wdir: 170, wspd: 30, gust: 35 });
+  assert.deepEqual(parseWind('05008'), { wdir: 50, wspd: 8, gust: null });
+  assert.deepEqual(parseWind('180', { wdir: 170, wspd: 30, gust: 35 }), { wdir: 180, wspd: 30, gust: 35 });
+  assert.equal(parseWind('17030G25').error, 'ENTRY OUT OF RANGE');
+  assert.equal(parseWind('37030').error, 'ENTRY OUT OF RANGE');
+  assert.equal(parseWind('1703').error, 'FORMAT ERROR');
+  assert.equal(parseWind('170300').error, 'FORMAT ERROR');
+});

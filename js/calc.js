@@ -88,3 +88,24 @@ export function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
   }
   return last; // 99 means "no limit within 99 kt" (pure headwind)
 }
+
+/**
+ * Parse scratchpad wind entry. Accepts:
+ *   170/30, 170/30G35, 17030, 17030G35 (METAR style, 3-digit dir + 2-digit speed),
+ *   170 (direction only), /30 (speed only, keeps direction; clears gust).
+ * prev = { wdir, wspd, gust } current values. Returns { wdir, wspd, gust } or { error }.
+ */
+export function parseWind(sp, prev = {}) {
+  const s = String(sp || '').trim().toUpperCase();
+  if (!s) return { error: '' };
+  const metar = s.match(/^(\d{3})(\d{2})(?:G(\d{2}))?$/);
+  const m = metar ? [s, metar[1], metar[2], metar[3]]
+                  : s.match(/^(\d{1,3})?(?:\/(\d{1,2})(?:G(\d{1,2}))?)?$/);
+  if (!m || (m[1] == null && m[2] == null)) return { error: 'FORMAT ERROR' };
+  const d = m[1] != null ? +m[1] : prev.wdir, v = m[2] != null ? +m[2] : prev.wspd;
+  if (d == null || v == null) return { error: 'FORMAT ERROR' };
+  if (d > 360 || (d === 0 && v > 0)) return { error: 'ENTRY OUT OF RANGE' };
+  const g = m[3] != null ? +m[3] : (m[2] != null ? null : (prev.gust ?? null));
+  if (g != null && g <= v) return { error: 'ENTRY OUT OF RANGE' };
+  return { wdir: d, wspd: v, gust: g };
+}

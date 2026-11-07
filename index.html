@@ -162,7 +162,7 @@ button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
   <section class="notes" aria-label="사용법과 판정 기준">
     <h2>입력 방법</h2>
     <dl>
-      <dt>250/28G35</dt><dd>바람 입력 후 WIND 옆 LSK (gust는 참조용)</dd>
+      <dt>250/28G35</dt><dd>바람 입력 후 WIND 옆 LSK (gust는 참조용) · 25028G35 형식도 가능</dd>
       <dt>334</dt><dd>RWY HDG 옆 LSK — 활주로 자방위 수동 입력</dd>
       <dt>9W · 12E</dt><dd>WIND REF 옆 LSK — 편차 수동 입력 (TRUE로 전환)</dd>
       <dt>빈 칸 + LSK</dt><dd>WIND REF: MAG/TRUE 전환 · APT/RWY: 공항 선택</dd>
@@ -267,6 +267,27 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
     last = v;
   }
   return last; // 99 means "no limit within 99 kt" (pure headwind)
+}
+
+/**
+ * Parse scratchpad wind entry. Accepts:
+ *   170/30, 170/30G35, 17030, 17030G35 (METAR style, 3-digit dir + 2-digit speed),
+ *   170 (direction only), /30 (speed only, keeps direction; clears gust).
+ * prev = { wdir, wspd, gust } current values. Returns { wdir, wspd, gust } or { error }.
+ */
+function parseWind(sp, prev = {}) {
+  const s = String(sp || '').trim().toUpperCase();
+  if (!s) return { error: '' };
+  const metar = s.match(/^(\d{3})(\d{2})(?:G(\d{2}))?$/);
+  const m = metar ? [s, metar[1], metar[2], metar[3]]
+                  : s.match(/^(\d{1,3})?(?:\/(\d{1,2})(?:G(\d{1,2}))?)?$/);
+  if (!m || (m[1] == null && m[2] == null)) return { error: 'FORMAT ERROR' };
+  const d = m[1] != null ? +m[1] : prev.wdir, v = m[2] != null ? +m[2] : prev.wspd;
+  if (d == null || v == null) return { error: 'FORMAT ERROR' };
+  if (d > 360 || (d === 0 && v > 0)) return { error: 'ENTRY OUT OF RANGE' };
+  const g = m[3] != null ? +m[3] : (m[2] != null ? null : (prev.gust ?? null));
+  if (g != null && g <= v) return { error: 'ENTRY OUT OF RANGE' };
+  return { wdir: d, wspd: v, gust: g };
 }
 
 
@@ -482,14 +503,9 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
 
   function enterWind(sp) {
     if (sp === 'CLR') { S.wdir = S.wspd = S.gust = null; return ok(); }
-    { const m = sp.match(/^(\d{1,3})?(?:\/(\d{1,2})(?:G(\d{1,2}))?)?$/);
-      if (!sp || !m || (m[1] == null && m[2] == null)) return err(sp ? 'FORMAT ERROR' : '');
-      const d = m[1] != null ? +m[1] : S.wdir, v = m[2] != null ? +m[2] : S.wspd;
-      if (d == null || v == null) return err('FORMAT ERROR');
-      if (d > 360 || (d === 0 && v > 0)) return err('ENTRY OUT OF RANGE');
-      const g = m[3] != null ? +m[3] : (m[2] != null ? null : S.gust);
-      if (g != null && g <= v) return err('ENTRY OUT OF RANGE');
-      S.wdir = d; S.wspd = v; S.gust = g; return ok(); }
+    const w = parseWind(sp, S);
+    if (w.error !== undefined) return err(w.error);
+    S.wdir = w.wdir; S.wspd = w.wspd; S.gust = w.gust; return ok();
   }
 
   function lskMain(id) {
