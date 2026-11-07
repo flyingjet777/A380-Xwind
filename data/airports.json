@@ -200,6 +200,120 @@
         }
       ],
       "hdgSource": "Captain-confirmed 015°/195° MAG; consistent with true 014.4°/194.4° (AIP Thailand SUP 37/24) + 0.6°W. Designators after 3 OCT 2024: 01/19, 02R/20L, 02L/20R."
+    },
+    "KJFK": {
+      "name": "NEW YORK",
+      "varDeg": -13,
+      "varSource": "FAA data (AirNav, eff 02 OCT 2025): VAR 13W (2020)",
+      "runways": [
+        {
+          "id": "04L",
+          "magHdg": 44,
+          "verified": true
+        },
+        {
+          "id": "04R",
+          "magHdg": 44,
+          "verified": true
+        },
+        {
+          "id": "13L",
+          "magHdg": 134,
+          "verified": true
+        },
+        {
+          "id": "13R",
+          "magHdg": 134,
+          "verified": true
+        },
+        {
+          "id": "22R",
+          "magHdg": 224,
+          "verified": true
+        },
+        {
+          "id": "22L",
+          "magHdg": 224,
+          "verified": true
+        },
+        {
+          "id": "31R",
+          "magHdg": 314,
+          "verified": true
+        },
+        {
+          "id": "31L",
+          "magHdg": 314,
+          "verified": true
+        }
+      ],
+      "hdgSource": "Captain-confirmed 044/224, 134/314 MAG; matches FAA (true 031/121 + 13W)"
+    },
+    "RCTP": {
+      "name": "TAIPEI",
+      "varDeg": -5,
+      "varSource": "Taiwan eAIP AMDT 06-25 (25 DEC 2025) AD 2.2: VAR 5°W (2025), annual 0.03°W",
+      "runways": [
+        {
+          "id": "05L",
+          "magHdg": 54,
+          "verified": true
+        },
+        {
+          "id": "05R",
+          "magHdg": 54,
+          "verified": true
+        },
+        {
+          "id": "23R",
+          "magHdg": 234,
+          "verified": true
+        },
+        {
+          "id": "23L",
+          "magHdg": 234,
+          "verified": true
+        }
+      ],
+      "hdgSource": "Captain-confirmed 054/234 MAG; matches eAIP true 049.1°/229.1° + 5°W"
+    },
+    "VHHH": {
+      "name": "HONG KONG",
+      "varDeg": -3,
+      "varSource": "Hong Kong eAIP (eff 01 OCT 2026) AD 2.2: VAR 3°W (2020), annual 4'W",
+      "runways": [
+        {
+          "id": "07L",
+          "magHdg": 74,
+          "verified": true
+        },
+        {
+          "id": "07C",
+          "magHdg": 74,
+          "verified": true
+        },
+        {
+          "id": "07R",
+          "magHdg": 74,
+          "verified": true
+        },
+        {
+          "id": "25R",
+          "magHdg": 254,
+          "verified": true
+        },
+        {
+          "id": "25C",
+          "magHdg": 254,
+          "verified": true
+        },
+        {
+          "id": "25L",
+          "magHdg": 254,
+          "verified": true
+        }
+      ],
+      "hdgSource": "Captain-confirmed 074/254 MAG; eAIP AD 2.12 publishes 073.90°M/253.90°M (true 070.90°)"
     }
   }
 }
