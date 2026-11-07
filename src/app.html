@@ -226,7 +226,7 @@ const APTS = /*__AIRPORTS__*/;
       : t(pad3(S.wdir) + '/' + pad2(S.wspd), 'cyan');
     const gustDat = S.gust == null ? t('--', 'cyan') : t('G' + S.gust, 'cyan');
 
-    let hwLbl = 'HW/TW', hwDat = dash, xwDat = dash, limDat = dash, gDat = dash, maxDat = dash,
+    let maxLbl = 'MAX WIND', hwLbl = 'HW/TW', hwDat = dash, xwDat = dash, limDat = dash, gDat = dash, maxDat = dash,
         vLbl = 'VERDICT', vDat = t('----', 'dim');
     if (r) {
       hwLbl = r.tw > 0 ? 'TAILWIND' : 'HEADWIND';
@@ -234,7 +234,8 @@ const APTS = /*__AIRPORTS__*/;
       xwDat = t((r.side ? r.side + ' ' : '') + r.xw.toFixed(1), r.xwOk ? 'green' : 'red');
       limDat = t(r.xwLimit.toFixed(1), 'green');
       if (r.gust) gDat = t(r.gust.xw.toFixed(1) + '/' + (r.gust.tw > 0 ? 'T' + r.gust.tw.toFixed(1) : 'H' + r.gust.hw.toFixed(1)), 'white small');
-      maxDat = r.maxWindKt >= 99 ? t('NO LIMIT', 'green') : t('upto ', 'green small') + t(r.maxWindKt + ' KT', 'green');
+      if (r.tw > 0) { maxDat = t('upto ', 'green small') + t(r.maxWindKt + ' KT', 'green'); }
+      else { maxLbl = 'MAX XW'; maxDat = t('upto ', 'green small') + t(E[S.eng].xwMaxKt + ' KT', 'green'); } // headwind zone: XW limit 35
       vLbl = r.go ? 'TAKEOFF' : (!r.twOk ? 'TW LIMIT' : 'XW LIMIT');
       vDat = r.go ? '<span class="verdict go">GO</span>' : '<span class="verdict nogo">NO GO</span>';
     }
@@ -246,7 +247,7 @@ const APTS = /*__AIRPORTS__*/;
         [esc(windLbl), 'GUST'], [windDat, gustDat],
         [hwLbl, 'CROSSWIND'], [hwDat, xwDat],
         ['XW LIMIT', 'GUST XW/TW REF'], [limDat, gDat],
-        ['MAX WIND', vLbl], [maxDat, vDat],
+        [maxLbl, vLbl], [maxDat, vDat],
       ], rawLabels: true,
     };
   }
