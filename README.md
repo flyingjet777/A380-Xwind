@@ -16,7 +16,7 @@ A380 이륙 측풍·배풍 제한 판정기. Airbus FOT 999.0069/26 Rev 00 (12-O
 ## 구조
 ```
 data/envelopes.json   엔진별 envelope (RR Trent 970/972, EA GP7270)
-data/airports.json    공항 프리셋 (RKSI 154/334, RJAA 157/337, KLAX 071/251)
+data/airports.json    공항 프리셋 (RKSI, RJAA, KLAX, YSSY, VTBS)
 js/calc.js            계산 코어 (정수 0.1 kt 단위 연산)
 src/app.html          CDU 화면 템플릿
 tools/build.py        calc.js + data → index.html 단일 파일 빌드

@@ -124,6 +124,82 @@
         }
       ],
       "hdgSource": "FAA data 071°/251° MAG; cross-check true 083.0°/263.0° - 12°E = 071°/251°"
+    },
+    "YSSY": {
+      "name": "SYDNEY",
+      "varDeg": 13,
+      "varSource": "Airservices ERSA FAC YSSY (03 SEP 2026): VAR 13 DEG E",
+      "runways": [
+        {
+          "id": "07",
+          "magHdg": 61,
+          "verified": true
+        },
+        {
+          "id": "16L",
+          "magHdg": 155,
+          "verified": true
+        },
+        {
+          "id": "16R",
+          "magHdg": 155,
+          "verified": true
+        },
+        {
+          "id": "25",
+          "magHdg": 241,
+          "verified": true
+        },
+        {
+          "id": "34R",
+          "magHdg": 335,
+          "verified": true
+        },
+        {
+          "id": "34L",
+          "magHdg": 335,
+          "verified": true
+        }
+      ],
+      "hdgSource": "Airservices ERSA FAC YSSY (03 SEP 2026): 07/25 061, 16L/34R 155, 16R/34L 155 (MAG). A380 normally 16R/34L (3962 m); 07/25 and 16L/34R are 45 m wide."
+    },
+    "VTBS": {
+      "name": "BANGKOK",
+      "varDeg": -0.6,
+      "varSource": "AIP Thailand SUP 37/24: VAR 0°35'W (2016), annual change 0",
+      "runways": [
+        {
+          "id": "01",
+          "magHdg": 15,
+          "verified": false
+        },
+        {
+          "id": "02L",
+          "magHdg": 15,
+          "verified": false
+        },
+        {
+          "id": "02R",
+          "magHdg": 15,
+          "verified": false
+        },
+        {
+          "id": "19",
+          "magHdg": 195,
+          "verified": false
+        },
+        {
+          "id": "20R",
+          "magHdg": 195,
+          "verified": false
+        },
+        {
+          "id": "20L",
+          "magHdg": 195,
+          "verified": false
+        }
+      ],
+      "hdgSource": "COMPUTED: true 014.4°/194.4° (AIP Thailand SUP 37/24) + 0.6°W = 015/195. Designators after 3 OCT 2024: 01/19 (ex 01R/19L, 4000 m), 02R/20L (ex 01L/19R, 3700 m), 02L/20R (new, 4000 m). VERIFY against company chart."
     }
   }
 }

@@ -177,7 +177,7 @@ button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 
 <script>
 const ENVELOPES = {"source": "Airbus FOT 999.0069/26 Rev 00 (12-OCT-2026), Illustration 1 & 2 — pixel-measured reading. PROVISIONAL until AFM advance copy is obtained.", "rules": {"tailwindLimitKt": 10, "tailwindAtLimitIsGo": false, "crosswindAtLimitIsGo": true, "gustUsedForVerdict": false, "componentRoundingKt": 0.1, "limitRounding": "floor to 0.1 kt (conservative)"}, "engines": {"RR": {"label": "RR TRENT 970/972", "fleet": "OZ", "xwMaxKt": 35, "xwAtTailwindLimitKt": 29}, "EA": {"label": "EA GP7270", "fleet": "KE", "xwMaxKt": 35, "xwAtTailwindLimitKt": 25}}};
-const APTS = {"note": "Runway headings are MAGNETIC. varDeg: East = +, West = -. MAG = TRUE - varDeg. 'verified' = true only when the MAG bearing is printed in the official AIP/FAA source. Cross-check against company Lido/Jeppesen charts before use.", "airports": {"RKSI": {"name": "INCHEON", "varDeg": -9, "varSource": "Korea AIP RKSI ADC, AIRAC AMDT 6/25 (eff 9 JUL 2025): VAR 9°W 2020, annual 6'W", "runways": [{"id": "15L", "magHdg": 154, "verified": true}, {"id": "15R", "magHdg": 154, "verified": true}, {"id": "16L", "magHdg": 154, "verified": true}, {"id": "16R", "magHdg": 154, "verified": true}, {"id": "33L", "magHdg": 334, "verified": true}, {"id": "33R", "magHdg": 334, "verified": true}, {"id": "34L", "magHdg": 334, "verified": true}, {"id": "34R", "magHdg": 334, "verified": true}], "hdgSource": "Captain-confirmed (company charts) 154°/334° MAG; consistent with true 144.8°/324.8° + 9°W (AIP ADC AMDT 6/25 prints 153°/333°)"}, "RJAA": {"name": "NARITA", "varDeg": -8, "varSource": "AIP Japan RJAA AD2.24-ADC-1 (EFF 10 JUL 2025): VAR 8°W 2023, annual 3'W", "runways": [{"id": "16L", "magHdg": 157, "verified": true}, {"id": "16R", "magHdg": 157, "verified": true}, {"id": "34L", "magHdg": 337, "verified": true}, {"id": "34R", "magHdg": 337, "verified": true}], "hdgSource": "Captain-confirmed (company charts) 157°/337° MAG; consistent with true 149.6°/329.6° + 7°W (AIP epoch 2008/2011)"}, "KLAX": {"name": "LOS ANGELES", "varDeg": 12, "varSource": "FAA d-TPP 2607 airport diagram: VAR 12°E", "runways": [{"id": "06L", "magHdg": 71, "verified": true}, {"id": "06R", "magHdg": 71, "verified": true}, {"id": "07L", "magHdg": 71, "verified": true}, {"id": "07R", "magHdg": 71, "verified": true}, {"id": "24L", "magHdg": 251, "verified": true}, {"id": "24R", "magHdg": 251, "verified": true}, {"id": "25L", "magHdg": 251, "verified": true}, {"id": "25R", "magHdg": 251, "verified": true}], "hdgSource": "FAA data 071°/251° MAG; cross-check true 083.0°/263.0° - 12°E = 071°/251°"}}};
+const APTS = {"note": "Runway headings are MAGNETIC. varDeg: East = +, West = -. MAG = TRUE - varDeg. 'verified' = true only when the MAG bearing is printed in the official AIP/FAA source. Cross-check against company Lido/Jeppesen charts before use.", "airports": {"RKSI": {"name": "INCHEON", "varDeg": -9, "varSource": "Korea AIP RKSI ADC, AIRAC AMDT 6/25 (eff 9 JUL 2025): VAR 9°W 2020, annual 6'W", "runways": [{"id": "15L", "magHdg": 154, "verified": true}, {"id": "15R", "magHdg": 154, "verified": true}, {"id": "16L", "magHdg": 154, "verified": true}, {"id": "16R", "magHdg": 154, "verified": true}, {"id": "33L", "magHdg": 334, "verified": true}, {"id": "33R", "magHdg": 334, "verified": true}, {"id": "34L", "magHdg": 334, "verified": true}, {"id": "34R", "magHdg": 334, "verified": true}], "hdgSource": "Captain-confirmed (company charts) 154°/334° MAG; consistent with true 144.8°/324.8° + 9°W (AIP ADC AMDT 6/25 prints 153°/333°)"}, "RJAA": {"name": "NARITA", "varDeg": -8, "varSource": "AIP Japan RJAA AD2.24-ADC-1 (EFF 10 JUL 2025): VAR 8°W 2023, annual 3'W", "runways": [{"id": "16L", "magHdg": 157, "verified": true}, {"id": "16R", "magHdg": 157, "verified": true}, {"id": "34L", "magHdg": 337, "verified": true}, {"id": "34R", "magHdg": 337, "verified": true}], "hdgSource": "Captain-confirmed (company charts) 157°/337° MAG; consistent with true 149.6°/329.6° + 7°W (AIP epoch 2008/2011)"}, "KLAX": {"name": "LOS ANGELES", "varDeg": 12, "varSource": "FAA d-TPP 2607 airport diagram: VAR 12°E", "runways": [{"id": "06L", "magHdg": 71, "verified": true}, {"id": "06R", "magHdg": 71, "verified": true}, {"id": "07L", "magHdg": 71, "verified": true}, {"id": "07R", "magHdg": 71, "verified": true}, {"id": "24L", "magHdg": 251, "verified": true}, {"id": "24R", "magHdg": 251, "verified": true}, {"id": "25L", "magHdg": 251, "verified": true}, {"id": "25R", "magHdg": 251, "verified": true}], "hdgSource": "FAA data 071°/251° MAG; cross-check true 083.0°/263.0° - 12°E = 071°/251°"}, "YSSY": {"name": "SYDNEY", "varDeg": 13, "varSource": "Airservices ERSA FAC YSSY (03 SEP 2026): VAR 13 DEG E", "runways": [{"id": "07", "magHdg": 61, "verified": true}, {"id": "16L", "magHdg": 155, "verified": true}, {"id": "16R", "magHdg": 155, "verified": true}, {"id": "25", "magHdg": 241, "verified": true}, {"id": "34R", "magHdg": 335, "verified": true}, {"id": "34L", "magHdg": 335, "verified": true}], "hdgSource": "Airservices ERSA FAC YSSY (03 SEP 2026): 07/25 061, 16L/34R 155, 16R/34L 155 (MAG). A380 normally 16R/34L (3962 m); 07/25 and 16L/34R are 45 m wide."}, "VTBS": {"name": "BANGKOK", "varDeg": -0.6, "varSource": "AIP Thailand SUP 37/24: VAR 0°35'W (2016), annual change 0", "runways": [{"id": "01", "magHdg": 15, "verified": false}, {"id": "02L", "magHdg": 15, "verified": false}, {"id": "02R", "magHdg": 15, "verified": false}, {"id": "19", "magHdg": 195, "verified": false}, {"id": "20R", "magHdg": 195, "verified": false}, {"id": "20L", "magHdg": 195, "verified": false}], "hdgSource": "COMPUTED: true 014.4°/194.4° (AIP Thailand SUP 37/24) + 0.6°W = 015/195. Designators after 3 OCT 2024: 01/19 (ex 01R/19L, 4000 m), 02R/20L (ex 01L/19R, 3700 m), 02L/20R (new, 4000 m). VERIFY against company chart."}}};
 // A380 Takeoff Crosswind Envelope — calculation core
 // Rules (Captain Cho, 2026-11-06):
 //  - Verdict uses STEADY wind only. Gust components are reference only.
@@ -273,7 +273,7 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
 (function () {
   const E = ENVELOPES.engines, A = APTS.airports, TWLIM = ENVELOPES.rules.tailwindLimitKt;
   const KEY = 'a380xw.v1';
-  const S = { page: 'ENG', eng: null, ref: 'MAG', varDeg: null, varMan: false, apt: null, rwy: null, hdg: null,
+  const S = { aptPage: 0, page: 'ENG', eng: null, ref: 'MAG', varDeg: null, varMan: false, apt: null, rwy: null, hdg: null,
               wdir: null, wspd: null, gust: null, sp: '', msg: '' };
   try {
     const s = JSON.parse(localStorage.getItem(KEY) || '{}');
@@ -358,18 +358,19 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
     };
   }
 
+  const APT_PER_PAGE = 10;
   function pageApt() {
-    const ids = Object.keys(A);
-    const rows = [];
-    for (let i = 0; i < 6; i++) {
-      const id = ids[i];
-      if (id) {
-        rows.push([A[id].name, 'VAR'], [t('<' + id, S.apt === id ? 'green' : 'cyan'), t(fmtVar(A[id].varDeg), 'white')]);
-      } else if (i === 5) {
-        rows.push(['', ''], [t('<RETURN', 'white'), '']);
-      } else rows.push(['', ''], ['', '']);
+    const ids = Object.keys(A), pages = Math.max(1, Math.ceil(ids.length / APT_PER_PAGE));
+    if (S.aptPage >= pages) S.aptPage = 0;
+    const base = S.aptPage * APT_PER_PAGE, rows = [];
+    const lbl = id => id ? esc(A[id].name + ' ' + fmtVar(A[id].varDeg)) : '';
+    for (let i = 0; i < 5; i++) {
+      const L = ids[base + i], R = ids[base + 5 + i];
+      rows.push([lbl(L), lbl(R)],
+        [L ? t('<' + L, S.apt === L ? 'green' : 'cyan') : '', R ? t(R + '>', S.apt === R ? 'green' : 'cyan') : '']);
     }
-    return { title: ln('ttl', '', '', 'AIRPORT'), rows };
+    rows.push(['', ''], [t('<RETURN', 'white'), t('MORE>', pages > 1 ? 'white' : 'dim')]);
+    return { title: ln('ttl', '', t((S.aptPage + 1) + '/' + pages, 'white small'), 'AIRPORT'), rows, rawLabels: true };
   }
 
   function pageRwy() {
@@ -533,11 +534,11 @@ function maxWind({ engine, rwyMagHdg, windMag, tailwindLimitKt = 10 }) {
     if (S.page === 'ENV') { if (id === 'L5') return enterWind(S.sp); if (id === 'L6') return go('MAIN'); if (id === 'R6') return go('PLOT'); if (id === 'L2') return go('APT'); return; }
     if (S.page === 'PLOT') { if (id === 'L6' || id === 'R6') return go('ENV'); return; }
     if (S.page === 'APT') {
-      const ids = Object.keys(A), i = +id[1] - 1;
-      if (id[0] === 'L' && ids[i]) {
-        S.apt = ids[i]; S.varDeg = A[S.apt].varDeg; S.varMan = false; save(); return go('RWY');
-      }
+      const ids = Object.keys(A), pages = Math.max(1, Math.ceil(ids.length / APT_PER_PAGE));
       if (id === 'L6') return go('MAIN');
+      if (id === 'R6') { S.aptPage = (S.aptPage + 1) % pages; return render(); }
+      const n = +id[1] - 1, x = ids[S.aptPage * APT_PER_PAGE + (id[0] === 'L' ? n : 5 + n)];
+      if (x) { S.apt = x; S.varDeg = A[x].varDeg; S.varMan = false; save(); return go('RWY'); }
       return;
     }
     if (S.page === 'RWY') {

@@ -183,7 +183,7 @@ const APTS = /*__AIRPORTS__*/;
 (function () {
   const E = ENVELOPES.engines, A = APTS.airports, TWLIM = ENVELOPES.rules.tailwindLimitKt;
   const KEY = 'a380xw.v1';
-  const S = { page: 'ENG', eng: null, ref: 'MAG', varDeg: null, varMan: false, apt: null, rwy: null, hdg: null,
+  const S = { aptPage: 0, page: 'ENG', eng: null, ref: 'MAG', varDeg: null, varMan: false, apt: null, rwy: null, hdg: null,
               wdir: null, wspd: null, gust: null, sp: '', msg: '' };
   try {
     const s = JSON.parse(localStorage.getItem(KEY) || '{}');
@@ -268,18 +268,19 @@ const APTS = /*__AIRPORTS__*/;
     };
   }
 
+  const APT_PER_PAGE = 10;
   function pageApt() {
-    const ids = Object.keys(A);
-    const rows = [];
-    for (let i = 0; i < 6; i++) {
-      const id = ids[i];
-      if (id) {
-        rows.push([A[id].name, 'VAR'], [t('<' + id, S.apt === id ? 'green' : 'cyan'), t(fmtVar(A[id].varDeg), 'white')]);
-      } else if (i === 5) {
-        rows.push(['', ''], [t('<RETURN', 'white'), '']);
-      } else rows.push(['', ''], ['', '']);
+    const ids = Object.keys(A), pages = Math.max(1, Math.ceil(ids.length / APT_PER_PAGE));
+    if (S.aptPage >= pages) S.aptPage = 0;
+    const base = S.aptPage * APT_PER_PAGE, rows = [];
+    const lbl = id => id ? esc(A[id].name + ' ' + fmtVar(A[id].varDeg)) : '';
+    for (let i = 0; i < 5; i++) {
+      const L = ids[base + i], R = ids[base + 5 + i];
+      rows.push([lbl(L), lbl(R)],
+        [L ? t('<' + L, S.apt === L ? 'green' : 'cyan') : '', R ? t(R + '>', S.apt === R ? 'green' : 'cyan') : '']);
     }
-    return { title: ln('ttl', '', '', 'AIRPORT'), rows };
+    rows.push(['', ''], [t('<RETURN', 'white'), t('MORE>', pages > 1 ? 'white' : 'dim')]);
+    return { title: ln('ttl', '', t((S.aptPage + 1) + '/' + pages, 'white small'), 'AIRPORT'), rows, rawLabels: true };
   }
 
   function pageRwy() {
@@ -443,11 +444,11 @@ const APTS = /*__AIRPORTS__*/;
     if (S.page === 'ENV') { if (id === 'L5') return enterWind(S.sp); if (id === 'L6') return go('MAIN'); if (id === 'R6') return go('PLOT'); if (id === 'L2') return go('APT'); return; }
     if (S.page === 'PLOT') { if (id === 'L6' || id === 'R6') return go('ENV'); return; }
     if (S.page === 'APT') {
-      const ids = Object.keys(A), i = +id[1] - 1;
-      if (id[0] === 'L' && ids[i]) {
-        S.apt = ids[i]; S.varDeg = A[S.apt].varDeg; S.varMan = false; save(); return go('RWY');
-      }
+      const ids = Object.keys(A), pages = Math.max(1, Math.ceil(ids.length / APT_PER_PAGE));
       if (id === 'L6') return go('MAIN');
+      if (id === 'R6') { S.aptPage = (S.aptPage + 1) % pages; return render(); }
+      const n = +id[1] - 1, x = ids[S.aptPage * APT_PER_PAGE + (id[0] === 'L' ? n : 5 + n)];
+      if (x) { S.apt = x; S.varDeg = A[x].varDeg; S.varMan = false; save(); return go('RWY'); }
       return;
     }
     if (S.page === 'RWY') {
