@@ -123,13 +123,6 @@ button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 .k.clr { grid-column: 4 / 6; grid-row: 3 / 5; aspect-ratio: auto; border-radius: .22em; font-size: 1.15em; }
 .k.sm { font-size: 1.05em; }
 
-/* ---------- notes ---------- */
-.notes { display: grid; gap: 10px; font-size: 13px; line-height: 1.55; color: var(--foot); }
-.notes h2 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--label); margin: 0; font-weight: 600; }
-.notes dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
-.notes dt { color: var(--label); font-family: var(--mono); font-size: 12px; }
-.notes dd { margin: 0; min-width: 0; }
-.notes .warn { color: var(--amber); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
@@ -159,20 +152,6 @@ button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
     </div>
   </div>
 
-  <section class="notes" aria-label="사용법과 판정 기준">
-    <h2>입력 방법</h2>
-    <dl>
-      <dt>250/28G35</dt><dd>바람 입력 후 WIND 옆 LSK (gust는 참조용) · 25028G35, 2528 (=250/28) 형식도 가능</dd>
-      <dt>334</dt><dd>RWY HDG 옆 LSK — 활주로 자방위 수동 입력</dd>
-      <dt>9W · 12E</dt><dd>WIND REF 옆 LSK — 편차 수동 입력 (TRUE로 전환)</dd>
-      <dt>빈 칸 + LSK</dt><dd>WIND REF: MAG/TRUE 전환 · APT/RWY: 공항 선택</dd>
-      <dt>CLR → LSK</dt><dd>해당 칸 삭제</dd>
-      <dt>ENV</dt><dd>선택 활주로의 측풍 한계 지점 바람 (방위/최대 정상풍) · PLOT&gt; 로 도표</dd>
-    </dl>
-    <h2>판정 기준</h2>
-    <div>정상풍만으로 판정 · 성분 0.1 kt 반올림 · TW 10.0 kt = NO GO · XW가 한계와 같으면 GO · 한계 표시는 0.1 kt 내림 · Gust는 참조 표시만.</div>
-    <div class="warn">Envelope은 Airbus FOT 999.0069/26 도표 판독값입니다(잠정). 참고용이며 AFM/FCOM과 회사 규정이 우선합니다.</div>
-  </section>
 </div>
 
 <script>
